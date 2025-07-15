@@ -1,0 +1,12 @@
+[package]
+name = "salt_atproto_core"
+version = "0.0.1"
+edition = "2024"
+
+[dependencies]
+atrium-api.workspace = true
+atrium-xrpc-client.workspace = true
+hickory-client = "0.25.2"
+ipld-core.workspace = true
+thiserror.workspace = true
+tokio.workspace = true

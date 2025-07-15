@@ -1,3 +1,4 @@
+// did:plc:zylhqsjug3f76uqxguhviqka
 use salt_atproto_core::{AppError, atproto, dns};
 #[tokio::main]
 async fn main() -> Result<(), AppError> {
