@@ -1,7 +1,7 @@
 use atrium_api::types::string::{Did, Nsid};
 use salt_atproto_core::{
     AppError, AtProtoClient, DnsClient,
-    atproto::{FoundLexica, get_lexicon_records, get_user_collections, nsid_address},
+    atproto::{FoundLexica, get_lexicon_nsids, get_user_collections, nsid_address},
     dns::get_txt_did,
 };
 use std::collections::HashMap;
@@ -84,7 +84,7 @@ pub async fn check_collection(
         while let Ok(FoundLexica {
             lexica,
             cursor: new_cursor,
-        }) = get_lexicon_records(atproto_client, &did, cursor.clone()).await
+        }) = get_lexicon_nsids(atproto_client, &did, cursor.clone()).await
         {
             for lexicon_nsid in lexica.iter() {
                 cache.mark_valid(lexicon_nsid.clone());

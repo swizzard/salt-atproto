@@ -27,7 +27,7 @@ pub fn atproto_client() -> AtProtoClient {
     Agent::new(session)
 }
 
-pub async fn get_lexicon_records(
+pub async fn get_lexicon_nsids(
     client: &AtProtoClient,
     did: &Did,
     cursor: Option<String>,
