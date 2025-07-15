@@ -1,10 +1,20 @@
-use lexicon_pruner::{AppError, dns};
+// did:plc:zylhqsjug3f76uqxguhviqka
+use lexicon_pruner::{AppError, atproto, dns};
 #[tokio::main]
 async fn main() -> Result<(), AppError> {
-    let mut client = dns::dns_client().await;
-    let nsid = String::from("community.lexicon.calendar.event");
-    let address = dns::nsid_address(nsid);
-    let did = dns::get_txt_did(&mut client, address).await?;
-    println!("got did: {did}");
+    let atproto_client = atproto::client();
+    let dns_client = dns::dns_client().await;
+    let mut cache = lexicon_pruner::_Cache::default();
+    let did =
+        atrium_api::types::string::Did::new("did:plc:xydueznukwpv3esjwcexd676".into()).unwrap();
+    let outcome =
+        lexicon_pruner::check_user_collections(&mut cache, &dns_client, &atproto_client, &did)
+            .await?;
+    println!("outcome:\n{outcome}");
+    // let mut client = dns::dns_client().await;
+    // let nsid = "blue.2048.player.profile";
+    // let address = dns::nsid_address(nsid);
+    // let did = dns::get_txt_did(&mut client, address).await?;
+    // println!("got did: {did:?}");
     Ok(())
 }

@@ -4,7 +4,10 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-atrium-api = { version = "0.25.4", features = ["tokio"] }
+atrium-api = { version = "0.25.4", features = ["agent", "tokio"] }
+atrium-xrpc-client = "0.5.14"
 hickory-client = "0.25.2"
+ipld-core = "0.4.2"
+regex = "1.11.1"
 thiserror = "2.0.12"
 tokio = { version = "1.46.1", features = ["full"] }
