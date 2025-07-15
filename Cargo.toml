@@ -4,6 +4,7 @@ members = ["core", "checker", "cli"]
 default-members = ["cli"]
 package.edition = "2024"
 package.license = "MIT"
+package.repository = "https://github.com/swizzard/salt-atproto"
 
 [workspace.dependencies]
 atrium-api = { version = "0.25.4", features = ["agent", "tokio"] }
