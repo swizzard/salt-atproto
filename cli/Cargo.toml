@@ -1,14 +1,14 @@
 [package]
 name = "salt_atproto_cli"
-version = "0.1.0"
+version = "0.1.1"
 description = "SALT CLI interface"
 edition.workspace = true
 license.workspace = true
 repository.workspace = true
 
 [dependencies]
-salt_atproto_core = "0.1.0"
-salt_atproto_checker = "0.1.0"
+salt_atproto_core = "0.1.1"
+salt_atproto_checker = "0.1.1"
 atrium-api.workspace = true
 atrium-xrpc-client.workspace = true
 hickory-client = "0.25.2"
