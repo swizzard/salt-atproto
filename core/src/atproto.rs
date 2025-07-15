@@ -1,4 +1,6 @@
-use crate::AppError;
+//! atproto-specific
+
+use crate::SaltError;
 use atrium_api::agent::Agent;
 use atrium_api::agent::atp_agent::{CredentialSession, store::MemorySessionStore};
 use atrium_api::com::atproto::repo::list_records;
@@ -13,12 +15,14 @@ pub use atrium_api::types::string::Did;
 
 pub type AtProtoClient = Agent<CredentialSession<MemorySessionStore, ReqwestClient>>;
 
+/// Nsids retrieved from com.atproto.repo.listRecords
 #[derive(Debug, Clone)]
-pub struct FoundLexica {
+pub struct FoundLexicaNsids {
     pub lexica: Vec<Nsid>,
     pub cursor: Option<String>,
 }
 
+/// Create an AtProto client
 pub fn atproto_client() -> AtProtoClient {
     let session = CredentialSession::new(
         ReqwestClient::new("https://bsky.social"),
@@ -27,11 +31,17 @@ pub fn atproto_client() -> AtProtoClient {
     Agent::new(session)
 }
 
-pub async fn get_lexicon_nsids(
+#[derive(Debug, Clone)]
+struct FoundRecords {
+    pub lexica: Vec<list_records::RecordData>,
+    pub cursor: Option<String>,
+}
+
+async fn get_lexica_records(
     client: &AtProtoClient,
     did: &Did,
     cursor: Option<String>,
-) -> Result<FoundLexica, AppError> {
+) -> Result<FoundRecords, SaltError> {
     use list_records::*;
     let data = ParametersData {
         cursor,
@@ -42,7 +52,7 @@ pub async fn get_lexicon_nsids(
     };
     let params = mk_parameters(data);
     match client.api.com.atproto.repo.list_records(params).await {
-        Err(_) => Err(AppError::AtProtoNotFoundError(
+        Err(_) => Err(SaltError::AtProtoNotFoundError(
             "com.atproto.lexicon.schema".into(),
         )),
         Ok(Object {
@@ -51,26 +61,38 @@ pub async fn get_lexicon_nsids(
         }) => {
             let lexica = records
                 .into_iter()
-                .map(
-                    |Object {
-                         data: RecordData { uri, .. },
-                         ..
-                     }| { Nsid::new(aturi_to_nsid(&uri).to_string()).unwrap() },
-                )
+                .map(|Object { data, .. }| data)
                 .collect();
-            Ok(FoundLexica { cursor, lexica })
+            Ok(FoundRecords { cursor, lexica })
         }
     }
+}
+
+/// Retrieve a page of lexicon NSIDs
+pub async fn get_lexicon_nsids(
+    client: &AtProtoClient,
+    did: &Did,
+    cursor: Option<String>,
+) -> Result<FoundLexicaNsids, SaltError> {
+    let FoundRecords { cursor, lexica } = get_lexica_records(client, did, cursor).await?;
+    let lexica = lexica
+        .into_iter()
+        .map(|list_records::RecordData { uri, .. }| {
+            Nsid::new(aturi_to_nsid(&uri).to_string()).unwrap()
+        })
+        .collect();
+    Ok(FoundLexicaNsids { lexica, cursor })
 }
 
 fn aturi_to_nsid(uri: &str) -> Nsid {
     Nsid::new(uri.rsplit_once('/').unwrap().1.to_string()).unwrap()
 }
 
+/// Retrieve all the Nsid of every collection in a repo
 pub async fn get_user_collections(
     client: &AtProtoClient,
     did: &Did,
-) -> Result<Vec<Nsid>, AppError> {
+) -> Result<Vec<Nsid>, SaltError> {
     use atrium_api::com::atproto::repo::describe_repo::*;
     let input_data = ParametersData {
         repo: AtIdentifier::Did(did.clone()),
@@ -83,16 +105,17 @@ pub async fn get_user_collections(
     {
         Ok(collections)
     } else {
-        Err(AppError::AtProtoNotFoundError("describe_repo".into()))
+        Err(SaltError::AtProtoNotFoundError("describe_repo".into()))
     }
 }
 
-pub async fn resolve_identity(client: &AtProtoClient, identifier: &str) -> Result<Did, AppError> {
-    /// CURRENTLY BROKEN
-    /// REQUIRES LOGGED-IN CLIENT
+/// Resolve an identity into a Did    
+/// CURRENTLY BROKEN
+/// REQUIRES LOGGED-IN CLIENT
+pub async fn resolve_identity(client: &AtProtoClient, identifier: &str) -> Result<Did, SaltError> {
     use atrium_api::com::atproto::identity::{defs::*, resolve_identity::*};
     let identifier = AtIdentifier::from_str(identifier)
-        .map_err(|_| AppError::IdentifierError(String::from(identifier)))?;
+        .map_err(|_| SaltError::IdentifierError(String::from(identifier)))?;
     let input_data = ParametersData { identifier };
     let params = mk_parameters(input_data);
     let resp = client
@@ -109,10 +132,11 @@ pub async fn resolve_identity(client: &AtProtoClient, identifier: &str) -> Resul
     {
         Ok(did)
     } else {
-        Err(AppError::AtProtoError)
+        Err(SaltError::AtProtoError)
     }
 }
-pub fn nsid_address(nsid: &str) -> String {
+/// Derive the URI where a NSID's lexicon's DID can be found
+pub fn nsid_lexicon_address(nsid: &str) -> String {
     // strip off `name` (last element), reverse remainder
     // e.g. `community.lexicon.calendar.event` -> `_lexicon.calendar.lexicon.community`
     // ill-formedness out of scope
@@ -140,10 +164,10 @@ mod test {
         assert_eq!(actual, expected)
     }
     #[test]
-    fn test_nsid_address() {
+    fn test_nsid_lexicon_address() {
         let nsid = "community.lexicon.calendar.event";
         let expected = String::from("_lexicon.calendar.lexicon.community");
-        let actual = nsid_address(nsid);
+        let actual = nsid_lexicon_address(nsid);
         assert_eq!(actual, expected)
     }
 }

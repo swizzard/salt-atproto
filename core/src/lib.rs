@@ -1,3 +1,6 @@
+//! salt_atproto_core    
+//! core tools
+
 #![feature(iter_intersperse)]
 use thiserror::Error;
 
@@ -7,8 +10,9 @@ pub mod dns;
 pub use atproto::{AtProtoClient, atproto_client};
 pub use dns::{DnsClient, dns_client};
 
+/// Our Error Type
 #[derive(Clone, Debug, Error)]
-pub enum AppError {
+pub enum SaltError {
     #[error("atproto error")]
     AtProtoError,
     #[error("atproto {0} not found")]

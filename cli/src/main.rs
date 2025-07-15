@@ -1,6 +1,6 @@
 use clap::{Parser, Subcommand};
 use salt_atproto_checker::{Cache, check_user_collections};
-use salt_atproto_core::{AppError, atproto_client, dns_client};
+use salt_atproto_core::{SaltError, atproto_client, dns_client};
 use std::str::FromStr;
 
 #[derive(Debug, Parser)]
@@ -18,7 +18,7 @@ enum Commands {
 }
 
 #[tokio::main]
-async fn main() -> Result<(), AppError> {
+async fn main() -> Result<(), SaltError> {
     let cli = Cli::parse();
     let atproto_client = atproto_client();
     match &cli.command {
@@ -26,7 +26,7 @@ async fn main() -> Result<(), AppError> {
             let dns_client = dns_client().await;
             let mut cache = Cache::default();
             let did = atrium_api::types::string::Did::from_str(did.as_str())
-                .map_err(|_| AppError::DIDError(did.clone()))?;
+                .map_err(|_| SaltError::DIDError(did.clone()))?;
             let outcome =
                 check_user_collections(&mut cache, &dns_client, &atproto_client, &did).await?;
             println!("outcome:\n{outcome}");

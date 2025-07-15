@@ -1,0 +1,3 @@
+# Checker
+
+Checks lexicon validity

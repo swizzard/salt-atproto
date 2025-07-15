@@ -1,17 +1,25 @@
+//! Check NSID validity    
+//! For our purposes, an NSID is valid if:    
+//!   * there is a DNS TXT record available the NSID's domain authority's `_lexicon` subdomain
+//!   * that TXT record contains `did=$LEXICON_REPO_DID`
+//!   * `$LEXICON_REPO_DID` contains a `com.atproto.lexicon.schema` record that defines the NSID
+
 use atrium_api::types::string::{Did, Nsid};
 use salt_atproto_core::{
-    AppError, AtProtoClient, DnsClient,
-    atproto::{FoundLexica, get_lexicon_nsids, get_user_collections, nsid_address},
+    AtProtoClient, DnsClient, SaltError,
+    atproto::{FoundLexicaNsids, get_lexicon_nsids, get_user_collections, nsid_lexicon_address},
     dns::get_txt_did,
 };
 use std::collections::HashMap;
 
+/// Whether a lexicon is valid (retrievable) or invalid
 #[derive(Debug, Eq, PartialEq)]
 pub enum Verdict {
     Valid,
     Invalid,
 }
 
+/// Cache seen NSIDs
 #[derive(Debug, Default)]
 pub struct Cache {
     known_valid: HashMap<Nsid, bool>,
@@ -35,8 +43,7 @@ impl Cache {
     }
 }
 
-// pub type Cache = std::sync::Arc<std::cell::RefCell<_Cache>>;
-
+/// Summary of results
 #[derive(Debug, Default)]
 pub struct Outcome {
     validity: HashMap<Nsid, bool>,
@@ -49,6 +56,7 @@ impl Outcome {
     fn mark_invalid(&mut self, nsid: Nsid) {
         self.validity.insert(nsid, false);
     }
+    /// Results, alphabetical by NSID
     pub fn ordered_results(&self) -> Vec<(&Nsid, bool)> {
         let mut results = self
             .validity
@@ -71,17 +79,18 @@ impl std::fmt::Display for Outcome {
     }
 }
 
+/// Validate a collection by NSID
 pub async fn check_collection(
     atproto_client: &AtProtoClient,
     mut dns_client: DnsClient,
     cache: &mut Cache,
     nsid: &Nsid,
-) -> Result<Verdict, AppError> {
-    let address = nsid_address(nsid.as_str());
+) -> Result<Verdict, SaltError> {
+    let address = nsid_lexicon_address(nsid.as_str());
     if let Ok(did) = get_txt_did(&mut dns_client, address).await {
         let mut cursor: Option<String> = None;
         let mut found = false;
-        while let Ok(FoundLexica {
+        while let Ok(FoundLexicaNsids {
             lexica,
             cursor: new_cursor,
         }) = get_lexicon_nsids(atproto_client, &did, cursor.clone()).await
@@ -109,12 +118,14 @@ pub async fn check_collection(
     }
 }
 
+/// Validate multiple collections by NSID    
+/// Skips `app.bsky` NSIDs, which are trivially valid
 pub async fn check_collections(
     cache: &mut Cache,
     dns_client: &DnsClient,
     atproto_client: &AtProtoClient,
     collections: Vec<Nsid>,
-) -> Result<Outcome, AppError> {
+) -> Result<Outcome, SaltError> {
     let mut outcome = Outcome::default();
     for ns in collections {
         let da = ns.domain_authority();
@@ -133,12 +144,13 @@ pub async fn check_collections(
     Ok(outcome)
 }
 
+/// Retrieve a repo's collections and validate them
 pub async fn check_user_collections(
     cache: &mut Cache,
     dns_client: &DnsClient,
     atproto_client: &AtProtoClient,
     user_did: &Did,
-) -> Result<Outcome, AppError> {
+) -> Result<Outcome, SaltError> {
     let user_collections = get_user_collections(atproto_client, user_did).await?;
     check_collections(cache, dns_client, atproto_client, user_collections).await
 }
