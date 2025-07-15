@@ -42,7 +42,9 @@ pub async fn get_lexicon_nsids(
     };
     let params = mk_parameters(data);
     match client.api.com.atproto.repo.list_records(params).await {
-        Err(_) => Err(AppError::AtProtoError),
+        Err(_) => Err(AppError::AtProtoNotFoundError(
+            "com.atproto.lexicon.schema".into(),
+        )),
         Ok(Object {
             data: OutputData { cursor, records },
             ..
@@ -81,26 +83,29 @@ pub async fn get_user_collections(
     {
         Ok(collections)
     } else {
-        Err(AppError::AtProtoError)
+        Err(AppError::AtProtoNotFoundError("describe_repo".into()))
     }
 }
 
 pub async fn resolve_identity(client: &AtProtoClient, identifier: &str) -> Result<Did, AppError> {
+    /// CURRENTLY BROKEN
+    /// REQUIRES LOGGED-IN CLIENT
     use atrium_api::com::atproto::identity::{defs::*, resolve_identity::*};
     let identifier = AtIdentifier::from_str(identifier)
         .map_err(|_| AppError::IdentifierError(String::from(identifier)))?;
     let input_data = ParametersData { identifier };
     let params = mk_parameters(input_data);
-    if let Ok(Output {
-        data: IdentityInfoData { did, .. },
-        ..
-    }) = client
+    let resp = client
         .api
         .com
         .atproto
         .identity
         .resolve_identity(params)
-        .await
+        .await;
+    if let Ok(Output {
+        data: IdentityInfoData { did, .. },
+        ..
+    }) = resp
     {
         Ok(did)
     } else {

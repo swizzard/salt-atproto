@@ -11,6 +11,8 @@ pub use dns::{DnsClient, dns_client};
 pub enum AppError {
     #[error("atproto error")]
     AtProtoError,
+    #[error("atproto {0} not found")]
+    AtProtoNotFoundError(String),
     #[error("dns resolution error")]
     DNSError(#[from] hickory_client::ClientError),
     #[error("no TXT record found at {0}")]

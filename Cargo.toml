@@ -1,6 +1,7 @@
 [workspace]
 resolver = "3"
 members = ["core", "checker", "cli"]
+default-members = ["cli"]
 package.edition = "2024"
 
 [workspace.dependencies]

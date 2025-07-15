@@ -12,3 +12,4 @@ hickory-client = "0.25.2"
 ipld-core.workspace = true
 thiserror.workspace = true
 tokio.workspace = true
+clap = { version = "4.5.41", features = ["derive"] }
