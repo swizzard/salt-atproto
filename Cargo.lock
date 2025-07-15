@@ -1599,7 +1599,7 @@ checksum = "28d3b2b1366ec20994f1fd18c3c594f05c5dd4bc44d8bb0c1c632c8d6829481f"
 
 [[package]]
 name = "salt_atproto_checker"
-version = "0.0.1"
+version = "0.1.0"
 dependencies = [
  "atrium-api",
  "atrium-xrpc-client",
@@ -1612,7 +1612,7 @@ dependencies = [
 
 [[package]]
 name = "salt_atproto_cli"
-version = "0.0.1"
+version = "0.1.0"
 dependencies = [
  "atrium-api",
  "atrium-xrpc-client",
@@ -1627,7 +1627,7 @@ dependencies = [
 
 [[package]]
 name = "salt_atproto_core"
-version = "0.0.1"
+version = "0.1.0"
 dependencies = [
  "atrium-api",
  "atrium-xrpc-client",
