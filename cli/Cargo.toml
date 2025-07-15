@@ -1,7 +1,9 @@
 [package]
 name = "salt_atproto_cli"
 version = "0.1.0"
+description = "SALT CLI interface"
 edition.workspace = true
+license.workspace = true
 
 [dependencies]
 salt_atproto_core = { path = "../core" }

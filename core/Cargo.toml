@@ -1,7 +1,9 @@
 [package]
 name = "salt_atproto_core"
 version = "0.1.0"
+description = "Core SALT libraries"
 edition.workspace = true
+license.workspace = true
 
 [dependencies]
 atrium-api.workspace = true
