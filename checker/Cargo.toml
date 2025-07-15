@@ -6,7 +6,7 @@ edition.workspace = true
 license.workspace = true
 
 [dependencies]
-salt_atproto_core = { path = "../core" }
+salt_atproto_core = "0.1.0"
 atrium-api.workspace = true
 atrium-xrpc-client.workspace = true
 hickory-client = "0.25.2"

@@ -1605,7 +1605,22 @@ dependencies = [
  "atrium-xrpc-client",
  "hickory-client",
  "ipld-core",
- "salt_atproto_core",
+ "salt_atproto_core 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "thiserror 2.0.12",
+ "tokio",
+]
+
+[[package]]
+name = "salt_atproto_checker"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2ff2fcf35df8b8494b60dd1c5ac21f9e7e759afdf757b02ace48027bc19f63b8"
+dependencies = [
+ "atrium-api",
+ "atrium-xrpc-client",
+ "hickory-client",
+ "ipld-core",
+ "salt_atproto_core 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "thiserror 2.0.12",
  "tokio",
 ]
@@ -1619,8 +1634,8 @@ dependencies = [
  "clap",
  "hickory-client",
  "ipld-core",
- "salt_atproto_checker",
- "salt_atproto_core",
+ "salt_atproto_checker 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "salt_atproto_core 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "thiserror 2.0.12",
  "tokio",
 ]
@@ -1628,6 +1643,20 @@ dependencies = [
 [[package]]
 name = "salt_atproto_core"
 version = "0.1.0"
+dependencies = [
+ "atrium-api",
+ "atrium-xrpc-client",
+ "hickory-client",
+ "ipld-core",
+ "thiserror 2.0.12",
+ "tokio",
+]
+
+[[package]]
+name = "salt_atproto_core"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ffe42df71d2080959a4caa42c7d410bf1d538f0d931238dfda8850dff15186c0"
 dependencies = [
  "atrium-api",
  "atrium-xrpc-client",
