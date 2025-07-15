@@ -1,17 +1,18 @@
 [package]
-name = "salt-atproto"
+name = "salt_atproto"
 version = "0.1.0"
 edition = "2024"
 
 [workspace]
 resolver = "3"
-members = ["core"]
+members = ["core", "checker"]
 package.edition = "2024"
 
 [dependencies]
 atrium-api.workspace = true
 tokio.workspace = true
 salt_atproto_core = { path = "./core" }
+salt_atproto_checker = { path = "./checker" }
 
 [workspace.dependencies]
 atrium-api = { version = "0.25.4", features = ["agent", "tokio"] }

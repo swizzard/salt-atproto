@@ -1490,11 +1490,25 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "28d3b2b1366ec20994f1fd18c3c594f05c5dd4bc44d8bb0c1c632c8d6829481f"
 
 [[package]]
-name = "salt-atproto"
+name = "salt_atproto"
 version = "0.1.0"
 dependencies = [
  "atrium-api",
+ "salt_atproto_checker",
  "salt_atproto_core",
+ "tokio",
+]
+
+[[package]]
+name = "salt_atproto_checker"
+version = "0.0.1"
+dependencies = [
+ "atrium-api",
+ "atrium-xrpc-client",
+ "hickory-client",
+ "ipld-core",
+ "salt_atproto_core",
+ "thiserror 2.0.12",
  "tokio",
 ]
 
